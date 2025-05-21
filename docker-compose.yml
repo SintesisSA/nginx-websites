@@ -66,5 +66,3 @@ services:
       GEOIPUPDATE_FREQUENCY: ${GEOIPUPDATE_FREQUENCY:-72}
     networks:
       - nginx-net
-
-
