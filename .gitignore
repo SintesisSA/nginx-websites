@@ -2,4 +2,3 @@
 /.vscode/
 /logs/
 .env
-/nginx/ssl/
