@@ -1,0 +1,70 @@
+name: nginx-full
+
+networks:
+  nginx-net:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx:1.28-alpine
+    container_name: nginx-server
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    dns:
+      - ${DNS:-8.8.8.8}
+    volumes:
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/conf/streams.d:/etc/nginx/streams.d:ro
+      - ./nginx/conf/includes:/etc/nginx/includes:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+      - ./nginx/geoip:/etc/nginx/geoip:ro
+      - ./logrotate/nginx:/etc/logrotate.d/nginx:ro
+      - ${LOGS_DIRECTORY:-./nginx/logs}:/var/log/nginx
+    environment:
+      TZ: America/La_Paz
+    networks:
+      - nginx-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  logrotate:
+    image: blacklabelops/logrotate:latest
+    container_name: nginx-logrotate
+    restart: unless-stopped
+    volumes:
+      - ${LOGS_DIRECTORY:-./nginx/logs}:/var/log/nginx:rw
+    environment:
+      TZ: America/La_Paz
+      LOGS_DIRECTORIES: /var/log/nginx
+      LOGROTATE_INTERVAL: daily
+      LOGROTATE_SIZE: 100M
+      LOGROTATE_COPIES: 10
+      LOGROTATE_COMPRESSION: compress
+    networks:
+      - nginx-net
+    depends_on:
+      - nginx
+
+  geoip-updater:
+    image: maxmindinc/geoipupdate:latest
+    container_name: nginx-geoip-updater
+    restart: unless-stopped
+    volumes:
+      - ./nginx/geoip:/usr/share/GeoIP:rw
+    environment:
+      GEOIPUPDATE_ACCOUNT_ID: ${GEOIPUPDATE_ACCOUNT_ID}
+      GEOIPUPDATE_LICENSE_KEY: ${GEOIPUPDATE_LICENSE_KEY}
+      GEOIPUPDATE_EDITION_IDS: GeoLite2-Country GeoLite2-City
+      GEOIPUPDATE_FREQUENCY: ${GEOIPUPDATE_FREQUENCY:-72}
+    networks:
+      - nginx-net
+
+
