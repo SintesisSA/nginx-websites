@@ -111,3 +111,31 @@ Logs are configured to include GeoIP information and are saved in JSON format fo
 - Load balancing with health checks
 - Secure TLS configuration
 - Rate limiting to prevent abuse
+
+## Basic Auth Configuration
+
+To protect a location or site with HTTP Basic Authentication:
+
+1. **Generate a password file** (if you don't have `htpasswd`, install it via `apache2-utils` or `httpd-tools`):
+   ```bash
+   htpasswd -c ./nginx/conf/.htpasswd yourusername
+   ```
+   You will be prompted to enter a password.
+
+2. **Edit your site configuration** (e.g., `nginx/conf/conf.d/default.conf`) and add inside the desired `location` or `server` block:
+   ```nginx
+   location /protected/ {
+       auth_basic "Restricted Area";
+       auth_basic_user_file /etc/nginx/conf/.htpasswd;
+       # ...other directives...
+   }
+   ```
+
+3. **Mount the `.htpasswd` file** in your Docker Compose volume so it is available inside the container.
+
+4. **Reload Nginx** to apply the changes:
+   ```bash
+   ./bin/reload.sh
+   ```
+
+Now, accessing `/protected/` will prompt for a username and password.
