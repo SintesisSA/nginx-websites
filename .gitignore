@@ -3,3 +3,5 @@
 /logs/
 .env
 /nginx/ssl/
+/nginx/logs/
+/nginx/geoip/

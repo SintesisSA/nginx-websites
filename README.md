@@ -1,20 +1,20 @@
-# Configuración de Nginx con Docker Compose
+# Nginx Configuration with Docker Compose
 
-Este repositorio contiene una configuración de Nginx optimizada y siguiendo las mejores prácticas, implementada con Docker Compose. Incluye servicios para gestión de logs (logrotate) y geolocalización (GeoIP).
+This repository contains an optimized Nginx configuration following best practices, implemented with Docker Compose. It includes services for log management (logrotate) and geolocation (GeoIP).
 
-## Características
+## Features
 
-- **Nginx**: Servidor web y proxy inverso altamente configurable.
-- **GeoIP**: Implementación para geolocalización de visitantes.
-- **Logrotate**: Rotación y gestión automática de logs.
-- **Divisiones de configuración**: Archivos separados mediante includes para una mejor organización.
-- **Ejemplos**:
-  - Configuración para API REST
-  - Streaming TCP/UDP
-  - Balanceo de carga
-  - Configuraciones de seguridad
+- **Nginx**: Highly configurable web server and reverse proxy.
+- **GeoIP**: Visitor geolocation implementation.
+- **Logrotate**: Automatic log rotation and management.
+- **Configuration splits**: Separate files using includes for better organization.
+- **Examples**:
+  - Configuration for REST API
+  - TCP/UDP Streaming
+  - Load balancing
+  - Security configurations
 
-## Estructura de directorios
+## Directory Structure
 
 ```
 ├── docker-compose.yml
@@ -46,68 +46,68 @@ Este repositorio contiene una configuración de Nginx optimizada y siguiendo las
 └── README.md
 ```
 
-## Requisitos previos
+## Prerequisites
 
-- Docker y Docker Compose instalados
-- Cuenta MaxMind para GeoIP (puede usar la versión gratuita GeoLite2)
-- Certificados SSL para los dominios (para producción)
+- Docker and Docker Compose installed
+- MaxMind account for GeoIP (you can use the free GeoLite2 version)
+- SSL certificates for your domains (for production)
 
-## Instalación y uso
+## Installation and Usage
 
-1. Clonar este repositorio
-2. Copiar `.env.example` a `.env` y configurar las variables:
+1. Clone this repository
+2. Copy `.env.example` to `.env` and configure the variables:
    ```bash
    cp .env.example .env
    ```
-3. Editar el archivo `.env` y agregar sus credenciales de MaxMind
-4. Crear los directorios necesarios:
+3. Edit the `.env` file and add your MaxMind credentials
+4. Create the necessary directories:
    ```bash
    mkdir -p nginx/conf/conf.d nginx/conf/api nginx/conf/streams nginx/html nginx/ssl logs/nginx data/geoip logrotate/conf
    ```
-5. Copiar los archivos de configuración a los directorios correspondientes:
+5. Copy the configuration files to the corresponding directories:
    - `nginx.conf` → `nginx/conf/`
    - `default.conf` → `nginx/conf/conf.d/`
    - `stream.conf` → `nginx/conf/streams.d/`
-6. Generar el archivo dhparam para SSL seguro:
+6. Generate the dhparam file for secure SSL:
    ```bash
    openssl dhparam -out ./nginx/ssl/dhparam.pem 2048
    ```
-7. Colocar los certificados SSL en el directorio `nginx/ssl/`
-8. Iniciar los servicios:
+7. Place your SSL certificates in the `nginx/ssl/` directory
+8. Start the services:
    ```bash
    docker compose up -d
    ```
 
-## Monitoreo de logs
+## Log Monitoring
 
-Los logs están configurados para incluir información de GeoIP y se guardan en formato JSON para un análisis más sencillo. Puede encontrarlos en:
+Logs are configured to include GeoIP information and are saved in JSON format for easier analysis. You can find them at:
 
-- Acceso HTTP: `logs/nginx/access.log`
-- Acceso JSON (analytics): `logs/nginx/analytics.log`
-- Acceso de Streams: `logs/nginx/stream_access.log`
-- Acceso API: `logs/nginx/api_access.log`
-- Errores: `logs/nginx/error.log`
+- HTTP Access: `logs/nginx/access.log`
+- JSON Access (analytics): `logs/nginx/analytics.log`
+- Streams Access: `logs/nginx/stream_access.log`
+- API Access: `logs/nginx/api_access.log`
+- Errors: `logs/nginx/error.log`
 
-## Personalización
+## Customization
 
-- Modifique los archivos de configuración según sus necesidades
-- Ajuste las políticas de seguridad y las reglas de caché
-- Configure los upstreams para sus servidores back-end
-- Ajuste los parámetros de rotación de logs
+- Modify the configuration files as needed
+- Adjust security policies and cache rules
+- Configure upstreams for your backend servers
+- Adjust log rotation parameters
 
-## Notas de seguridad
+## Security Notes
 
-- Cambie regularmente las claves SSL
-- Ajuste las restricciones de GeoIP según sus necesidades
-- Revise periódicamente los logs para detectar patrones de ataque
-- Considere implementar Web Application Firewall (WAF) para mayor seguridad
+- Change SSL keys regularly
+- Adjust GeoIP restrictions as needed
+- Periodically review logs for attack patterns
+- Consider implementing a Web Application Firewall (WAF) for increased security
 
-## Mejores prácticas implementadas
+## Best Practices Implemented
 
-- Separación de configuraciones por funcionalidad
-- Reglas de caché optimizadas
-- Headers de seguridad HTTP
-- Rotación de logs eficiente
-- Balanceo de carga con comprobaciones de salud
-- Configuración TLS segura
-- Limitación de tasas para prevenir abusos
+- Separation of configurations by functionality
+- Optimized cache rules
+- HTTP security headers
+- Efficient log rotation
+- Load balancing with health checks
+- Secure TLS configuration
+- Rate limiting to prevent abuse
